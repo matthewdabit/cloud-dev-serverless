@@ -27,23 +27,32 @@ export const handler = middy(
                 done: false,
                 ...parsedBody
           };
-
-        await docClient.put({
-              TableName: todosTable,
-              Item: newTodo
-        }).promise();
-
-        return {
-              statusCode: 201,
-              headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true
-              },
-              body: JSON.stringify({
-                newTodo
-              })
-        };
-
+          try {
+              await docClient.put({
+                    TableName: todosTable,
+                    Item: newTodo
+              }).promise();
+    
+              return {
+                    statusCode: 201,
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Credentials': true
+                    },
+                    body: JSON.stringify({
+                        item: newTodo
+                    })
+              };
+          } catch (e) {
+                console.log('Failed to update todo ', e)
+                return {
+                      statusCode: 404,
+                      headers: {
+                        'Access-Control-Allow-Origin': '*'
+                      },
+                      body: ''
+                }
+          }
     }
 );
 
