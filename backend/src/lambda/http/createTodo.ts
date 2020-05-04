@@ -8,7 +8,7 @@ import * as uuid from 'uuid';
 import * as middy from 'middy';
 import {cors} from 'middy/middlewares';
 
-import {parseUserId} from "../../auth/utils";
+import {getUserId} from "../../auth/utils";
 
 const todosTable = process.env.TODOS_TABLE;
 const docClient = new AWS.DynamoDB.DocumentClient();
@@ -17,12 +17,9 @@ const docClient = new AWS.DynamoDB.DocumentClient();
 export const handler = middy(
     async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
           const parsedBody: CreateTodoRequest = JSON.parse(event.body);
-          const authorization = event.headers.Authorization;
-          const split = authorization.split(' ');
-          const jwtToken = split[1];
           const newTodo = {
                 todoId: uuid.v4(),
-                userId: parseUserId(jwtToken),
+                userId: getUserId(event),
                 createdAt: new Date().toISOString(),
                 done: false,
                 ...parsedBody

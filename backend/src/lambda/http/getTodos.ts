@@ -1,7 +1,7 @@
 import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda';
-import {parseUserId} from "../../auth/utils";
+import {getUserId} from "../../auth/utils";
 import * as AWS  from 'aws-sdk';
 import {TodoItem} from "../../models/TodoItem";
 
@@ -12,11 +12,7 @@ const docClient = new AWS.DynamoDB.DocumentClient();
 
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-
-  const authorization = event.headers.Authorization;
-  const split = authorization.split(' ');
-  const jwtToken = split[1];
-  const userId = parseUserId(jwtToken);
+  const userId = getUserId(event);
   const todos = await getTodosForUser(userId);
 
   return {
