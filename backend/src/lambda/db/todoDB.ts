@@ -1,4 +1,5 @@
 import * as AWS from 'aws-sdk'
+import {TodoItem} from "../../models/TodoItem";
 
 
 export class TodosDB {
