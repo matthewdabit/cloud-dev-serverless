@@ -21,7 +21,7 @@ export const handler = middy(
           const split = authorization.split(' ');
           const jwtToken = split[1];
           const newTodo = {
-                id: uuid.v4(),
+                todoId: uuid.v4(),
                 userId: parseUserId(jwtToken),
                 createdAt: new Date().toISOString(),
                 done: false,
@@ -44,7 +44,7 @@ export const handler = middy(
                     })
               };
           } catch (e) {
-                console.log('Failed to update todo ', e)
+                console.log('Failed to update todo ', e);
                 return {
                       statusCode: 404,
                       headers: {
