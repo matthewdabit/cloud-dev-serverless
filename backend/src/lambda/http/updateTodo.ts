@@ -1,16 +1,11 @@
 import 'source-map-support/register'
 
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import {APIGatewayProxyEvent, APIGatewayProxyResult} from 'aws-lambda';
 
-import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
+import {UpdateTodoRequest} from '../../requests/UpdateTodoRequest'
 import * as middy from 'middy';
-import { cors } from 'middy/middlewares';
-import * as AWS  from 'aws-sdk';
-
-
-
-const todosTable = process.env.TODOS_TABLE;
-const docClient = new AWS.DynamoDB.DocumentClient();
+import {cors} from 'middy/middlewares';
+import {updateTodo} from "../service/todoService";
 
 
 export const handler = middy(
@@ -19,22 +14,7 @@ export const handler = middy(
       const updatedTodo: UpdateTodoRequest = JSON.parse(event.body);
 
       try {
-          const updatedTodoItem = {
-            TableName: todosTable,
-            Key: {
-              todoId: todoId
-            },
-            ExpressionAttributeNames: { '#name': 'name' },
-            UpdateExpression: 'set #name = :name, dueDate = :dueDate, done = :done',
-            ExpressionAttributeValues: {
-              ':name': updatedTodo.name,
-              ':dueDate': updatedTodo.dueDate,
-              ':done': updatedTodo.done
-            },
-            ReturnValues: 'UPDATED_NEW'
-          };
-          await docClient.update(updatedTodoItem).promise();
-
+          await updateTodo(todoId, updatedTodo);
           return {
             statusCode: 200,
             headers: {
