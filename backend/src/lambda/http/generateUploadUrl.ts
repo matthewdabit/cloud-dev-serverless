@@ -4,14 +4,10 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as AWS from 'aws-sdk'
 import * as middy from 'middy';
 import { cors } from 'middy/middlewares';
+import {createImageUrl} from "../s3/createImageUrl";
 
-const bucketName = process.env.TODOS_ATTACHMENT_S3_BUCKET;
-const urlExpiration = process.env.SIGNED_URL_EXPIRATION;
 const todosTable = process.env.TODOS_TABLE;
 
-const s3 = new AWS.S3({
-  signatureVersion: 'v4'
-});
 const docClient = new AWS.DynamoDB.DocumentClient();
 
 
@@ -53,20 +49,7 @@ export const handler = middy(
 );
 
 
-function createImageUrl(todoId: string) {
-  const uploadUrl = s3.getSignedUrl('putObject', {
-    Bucket: bucketName,
-    Key: todoId,
-    Expires: urlExpiration
-  });
 
-  const s3Url = `https://${bucketName}.s3.amazonaws.com/${todoId}`;
-
-  return {
-    uploadUrl,
-    s3Url
-  }
-}
 
 handler.use(
   cors({
